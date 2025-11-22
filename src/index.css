@@ -143,6 +143,6 @@ All colors MUST be HSL.
   }
 
   .particle-dot {
-    @apply rounded-full animate-pulse;
+    @apply rounded-full;
   }
 }

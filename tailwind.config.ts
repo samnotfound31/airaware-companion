@@ -110,10 +110,16 @@ export default {
         },
         "float": {
           "0%, 100%": {
-            transform: "translateY(0px)"
+            transform: "translate(0, 0)"
+          },
+          "25%": {
+            transform: "translate(var(--float-distance, 10px), calc(var(--float-distance, 10px) * -0.5))"
           },
           "50%": {
-            transform: "translateY(-10px)"
+            transform: "translate(0, calc(var(--float-distance, 10px) * -1))"
+          },
+          "75%": {
+            transform: "translate(calc(var(--float-distance, 10px) * -1), calc(var(--float-distance, 10px) * -0.5))"
           }
         }
       },
@@ -123,7 +129,7 @@ export default {
         "fade-in": "fade-in 0.3s ease-out",
         "slide-up": "slide-up 0.4s ease-out",
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
-        "float": "float 3s ease-in-out infinite",
+        "float": "float 4s ease-in-out infinite",
       },
     },
   },
