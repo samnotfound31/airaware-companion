@@ -1,35 +1,53 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { MapPin, Bell, User, TrendingUp, Droplets, Wind, Eye, Gauge, Sun, Moon } from "lucide-react";
+import { MapPin, Bell, User, TrendingUp, Droplets, Wind, Eye, Gauge, Sun } from "lucide-react";
 import ParticleCloud from "@/components/ParticleCloud";
+import { useLocation, useAQIData, useWeatherData } from "@/hooks/useAQIData";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 type AQIBand = "good" | "moderate" | "unhealthy" | "veryUnhealthy" | "hazardous";
 
 const Dashboard = () => {
-  // Mock data - would come from API
-  const [aqiData] = useState({
-    value: 45,
-    status: "Good" as const,
-    band: "good" as AQIBand,
-    trend: "Rising",
-    station: "Downtown Monitor",
-    updatedAt: "2 min ago",
-    pm25: { value: 12.5, whoLimit: 25, percentage: 50 },
-    pm10: { value: 28.3, whoLimit: 50, percentage: 57 },
-  });
+  // Get user's location
+  const { data: location, isLoading: locationLoading, error: locationError } = useLocation();
+  
+  // Fetch AQI and weather data
+  const { data: aqiData, isLoading: aqiLoading, error: aqiError } = useAQIData(location?.lat, location?.lon);
+  const { data: weatherData, isLoading: weatherLoading } = useWeatherData(location?.lat, location?.lon);
 
-  const [weatherData] = useState({
-    temp: 72,
-    feelsLike: 68,
-    humidity: 65,
-    pressure: 1013,
-    pressureTrend: "Stable",
-    wind: { speed: 12, gust: 18, direction: "NW" },
-    uv: 6,
-    visibility: 10,
-    sunrise: "6:42 AM",
-    sunset: "7:23 PM",
-  });
+  const [userCity, setUserCity] = useState("Loading...");
+
+  useEffect(() => {
+    if (aqiData?.location) {
+      setUserCity(aqiData.location);
+    }
+  }, [aqiData]);
+
+  // Helper function to determine AQI band
+  const getAQIBand = (aqi: number): AQIBand => {
+    if (aqi <= 50) return "good";
+    if (aqi <= 100) return "moderate";
+    if (aqi <= 150) return "unhealthy";
+    if (aqi <= 200) return "veryUnhealthy";
+    return "hazardous";
+  };
+
+  // Helper function to get status text
+  const getAQIStatus = (aqi: number): string => {
+    if (aqi <= 50) return "Good";
+    if (aqi <= 100) return "Moderate";
+    if (aqi <= 150) return "Unhealthy for Sensitive Groups";
+    if (aqi <= 200) return "Unhealthy";
+    if (aqi <= 300) return "Very Unhealthy";
+    return "Hazardous";
+  };
+
+  const currentAQI = aqiData?.aqi || 0;
+  const pm25 = aqiData?.pm25 || 0;
+  const pm10 = aqiData?.pm10 || 0;
+  const band = getAQIBand(currentAQI);
+  const status = getAQIStatus(currentAQI);
 
   const getBandColor = (band: AQIBand) => {
     const colors = {
@@ -53,17 +71,67 @@ const Dashboard = () => {
     return gradients[band];
   };
 
+  // Loading state
+  if (locationLoading || aqiLoading) {
+    return (
+      <div 
+        className="min-h-screen transition-all duration-700 ease-in-out"
+        style={{ background: getBackgroundGradient("good") }}
+      >
+        <header className="sticky top-0 z-10 backdrop-blur-xl bg-background/30 border-b border-border/30">
+          <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
+            <Skeleton className="h-6 w-32" />
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-10 w-10 rounded-full" />
+              <Skeleton className="h-10 w-10 rounded-full" />
+            </div>
+          </div>
+        </header>
+        <main className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+          <Skeleton className="h-48 w-full rounded-3xl" />
+          <Skeleton className="h-64 w-full rounded-3xl" />
+        </main>
+      </div>
+    );
+  }
+
+  // Error state
+  if (locationError || aqiError) {
+    return (
+      <div 
+        className="min-h-screen flex items-center justify-center p-4"
+        style={{ background: getBackgroundGradient("good") }}
+      >
+        <div className="max-w-md">
+          <Alert variant="destructive" className="glass-card">
+            <AlertDescription>
+              {locationError ? 
+                "Unable to access your location. Please enable location services." : 
+                "Unable to fetch air quality data. Please try again later."}
+            </AlertDescription>
+            <Button 
+              className="mt-4 w-full" 
+              onClick={() => window.location.reload()}
+            >
+              Retry
+            </Button>
+          </Alert>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div 
       className="min-h-screen transition-all duration-700 ease-in-out"
-      style={{ background: getBackgroundGradient(aqiData.band) }}
+      style={{ background: getBackgroundGradient(band) }}
     >
       {/* Header */}
       <header className="sticky top-0 z-10 backdrop-blur-xl bg-background/30 border-b border-border/30">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <MapPin className="w-5 h-5 text-accent" />
-            <span className="font-semibold">San Francisco, CA</span>
+            <span className="font-semibold">{userCity}</span>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" className="rounded-full relative">
@@ -81,12 +149,12 @@ const Dashboard = () => {
         {/* Hero AQI */}
         <div className="glass-card rounded-3xl p-8 text-center animate-slide-up">
           <div className="mb-4">
-            <div className="aqi-number mb-2" style={{ color: getBandColor(aqiData.band) }}>
-              {aqiData.value}
+            <div className="aqi-number mb-2" style={{ color: getBandColor(band) }}>
+              {currentAQI}
             </div>
-            <h2 className="text-2xl font-bold mb-1">{aqiData.status}</h2>
+            <h2 className="text-2xl font-bold mb-1">{status}</h2>
             <p className="text-sm text-muted-foreground">
-              Updated {aqiData.updatedAt} • Station: {aqiData.station}
+              Updated {aqiData?.timestamp ? new Date(aqiData.timestamp).toLocaleTimeString() : 'recently'}
             </p>
           </div>
 
@@ -96,7 +164,7 @@ const Dashboard = () => {
             </span>
             <span className="px-4 py-1.5 rounded-full bg-secondary text-sm font-medium flex items-center gap-1">
               <TrendingUp className="w-4 h-4" />
-              {aqiData.trend}
+              Live
             </span>
           </div>
         </div>
@@ -109,15 +177,15 @@ const Dashboard = () => {
             <div className="space-y-3">
               <div>
                 <div className="text-sm text-muted-foreground mb-1">PM2.5</div>
-                <div className="text-3xl font-bold" style={{ color: getBandColor(aqiData.band) }}>
-                  {aqiData.pm25.percentage}%
+                <div className="text-3xl font-bold" style={{ color: getBandColor(band) }}>
+                  {pm25.toFixed(1)}
                 </div>
-                <div className="text-xs text-muted-foreground">{aqiData.pm25.value} µg/m³</div>
+                <div className="text-xs text-muted-foreground">µg/m³</div>
               </div>
               <div className="h-32 rounded-2xl bg-secondary/50 overflow-hidden">
                 <ParticleCloud 
-                  density={aqiData.pm25.percentage / 100} 
-                  color={getBandColor(aqiData.band)}
+                  density={Math.min(pm25 / 100, 1)} 
+                  color={getBandColor(band)}
                 />
               </div>
             </div>
@@ -126,15 +194,15 @@ const Dashboard = () => {
             <div className="space-y-3">
               <div>
                 <div className="text-sm text-muted-foreground mb-1">PM10</div>
-                <div className="text-3xl font-bold" style={{ color: getBandColor(aqiData.band) }}>
-                  {aqiData.pm10.percentage}%
+                <div className="text-3xl font-bold" style={{ color: getBandColor(band) }}>
+                  {pm10.toFixed(1)}
                 </div>
-                <div className="text-xs text-muted-foreground">{aqiData.pm10.value} µg/m³</div>
+                <div className="text-xs text-muted-foreground">µg/m³</div>
               </div>
               <div className="h-32 rounded-2xl bg-secondary/50 overflow-hidden">
                 <ParticleCloud 
-                  density={aqiData.pm10.percentage / 100}
-                  color={getBandColor(aqiData.band)}
+                  density={Math.min(pm10 / 150, 1)}
+                  color={getBandColor(band)}
                 />
               </div>
             </div>
@@ -145,61 +213,48 @@ const Dashboard = () => {
         <div className="space-y-3 animate-slide-up" style={{ animationDelay: "0.2s" }}>
           <h3 className="text-lg font-bold px-2">Weather</h3>
           <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory hide-scrollbar">
-            {/* Temperature */}
-            <div className="glass-card rounded-2xl p-4 min-w-[140px] snap-start">
-              <div className="text-sm text-muted-foreground mb-2">Temperature</div>
-              <div className="weather-value mb-1">{weatherData.temp}°</div>
-              <div className="text-xs text-muted-foreground">Feels like {weatherData.feelsLike}°</div>
-            </div>
+            {weatherLoading ? (
+              Array(5).fill(0).map((_, i) => (
+                <Skeleton key={i} className="min-w-[140px] h-24 rounded-2xl" />
+              ))
+            ) : weatherData ? (
+              <>
+                {/* Temperature */}
+                <div className="glass-card rounded-2xl p-4 min-w-[140px] snap-start">
+                  <div className="text-sm text-muted-foreground mb-2">Temperature</div>
+                  <div className="weather-value mb-1">{Math.round(weatherData.temp)}°</div>
+                  <div className="text-xs text-muted-foreground">Feels like {Math.round(weatherData.feelsLike)}°</div>
+                </div>
 
-            {/* Humidity */}
-            <div className="glass-card rounded-2xl p-4 min-w-[140px] snap-start">
-              <div className="flex items-center gap-2 mb-2">
-                <Droplets className="w-4 h-4 text-blue-400" />
-                <div className="text-sm text-muted-foreground">Humidity</div>
-              </div>
-              <div className="weather-value">{weatherData.humidity}%</div>
-            </div>
+                {/* Humidity */}
+                <div className="glass-card rounded-2xl p-4 min-w-[140px] snap-start">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Droplets className="w-4 h-4 text-blue-400" />
+                    <div className="text-sm text-muted-foreground">Humidity</div>
+                  </div>
+                  <div className="weather-value">{weatherData.humidity}%</div>
+                </div>
 
-            {/* Wind */}
-            <div className="glass-card rounded-2xl p-4 min-w-[140px] snap-start">
-              <div className="flex items-center gap-2 mb-2">
-                <Wind className="w-4 h-4 text-accent" />
-                <div className="text-sm text-muted-foreground">Wind</div>
-              </div>
-              <div className="text-2xl font-bold mb-1">{weatherData.wind.speed} mph</div>
-              <div className="text-xs text-muted-foreground">Gust {weatherData.wind.gust} • {weatherData.wind.direction}</div>
-            </div>
+                {/* Wind */}
+                <div className="glass-card rounded-2xl p-4 min-w-[140px] snap-start">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Wind className="w-4 h-4 text-accent" />
+                    <div className="text-sm text-muted-foreground">Wind</div>
+                  </div>
+                  <div className="text-2xl font-bold mb-1">{Math.round(weatherData.windSpeed)} mph</div>
+                </div>
 
-            {/* UV Index */}
-            <div className="glass-card rounded-2xl p-4 min-w-[140px] snap-start">
-              <div className="flex items-center gap-2 mb-2">
-                <Sun className="w-4 h-4 text-yellow-400" />
-                <div className="text-sm text-muted-foreground">UV Index</div>
-              </div>
-              <div className="weather-value">{weatherData.uv}</div>
-              <div className="text-xs text-muted-foreground">Moderate</div>
-            </div>
-
-            {/* Visibility */}
-            <div className="glass-card rounded-2xl p-4 min-w-[140px] snap-start">
-              <div className="flex items-center gap-2 mb-2">
-                <Eye className="w-4 h-4 text-muted-foreground" />
-                <div className="text-sm text-muted-foreground">Visibility</div>
-              </div>
-              <div className="weather-value">{weatherData.visibility}</div>
-              <div className="text-xs text-muted-foreground">miles</div>
-            </div>
-
-            {/* Pressure */}
-            <div className="glass-card rounded-2xl p-4 min-w-[140px] snap-start">
-              <div className="flex items-center gap-2 mb-2">
-                <Gauge className="w-4 h-4 text-muted-foreground" />
-                <div className="text-sm text-muted-foreground">Pressure</div>
-              </div>
-              <div className="text-2xl font-bold mb-1">{weatherData.pressure}</div>
-              <div className="text-xs text-muted-foreground">hPa • {weatherData.pressureTrend}</div>
-            </div>
+                {/* Description */}
+                <div className="glass-card rounded-2xl p-4 min-w-[140px] snap-start">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sun className="w-4 h-4 text-yellow-400" />
+                    <div className="text-sm text-muted-foreground">Condition</div>
+                  </div>
+                  <div className="text-2xl mb-1">{weatherData.icon}</div>
+                  <div className="text-xs text-muted-foreground">{weatherData.description}</div>
+                </div>
+              </>
+            ) : null}
           </div>
         </div>
 
@@ -212,8 +267,11 @@ const Dashboard = () => {
             AI Concierge
           </h3>
           <p className="text-sm mb-4 leading-relaxed">
-            Good morning! Air quality is excellent right now. Perfect conditions for outdoor activities. 
-            Enjoy your day! 🌤️
+            {currentAQI <= 50 ? 
+              "Air quality is excellent! Perfect conditions for outdoor activities. Enjoy your day! 🌤️" :
+              currentAQI <= 100 ?
+              "Air quality is moderate. Most people can enjoy outdoor activities. Sensitive individuals should consider limiting prolonged exposure." :
+              "Air quality is concerning. Consider limiting outdoor activities, especially if you're sensitive to air pollution."}
           </p>
           <div className="flex gap-2 flex-wrap mb-4">
             <Button variant="outline" size="sm" className="rounded-full">Safe to run?</Button>
