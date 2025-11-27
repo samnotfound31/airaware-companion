@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,7 +6,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Wind } from "lucide-react";
 
 const Auth = () => {
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -20,9 +18,9 @@ const Auth = () => {
       // Check if first time user (simplified for demo)
       const isFirstTime = !localStorage.getItem("onboarding_complete");
       if (isFirstTime) {
-        navigate("/onboarding");
+        window.location.href = "/static/onboarding.html";
       } else {
-        navigate("/dashboard");
+        window.location.href = "/static/dashboard.html";
       }
     }, 1000);
   };

@@ -2,7 +2,7 @@
 
 ## Building for Flask Integration
 
-This guide explains how to build the React frontend and integrate it with your Flask backend.
+This guide explains how to build the React frontend (multi-page setup) and integrate it with your Flask backend.
 
 ## Build Process
 
@@ -12,8 +12,10 @@ This guide explains how to build the React frontend and integrate it with your F
    ```
 
 2. **After build completes, you'll find:**
-   - `dist/index.html` - Main HTML file
-   - `dist/assets/` - All JS, CSS, and other assets
+   - `dist/auth.html` - Authentication page
+   - `dist/onboarding.html` - User onboarding page
+   - `dist/dashboard.html` - Main dashboard page
+   - `dist/assets/` - All JS, CSS, and other assets (separate per page)
 
 ## Flask Integration Steps
 
@@ -22,16 +24,16 @@ This guide explains how to build the React frontend and integrate it with your F
 After building, copy the files to your Flask project:
 
 ```bash
-# Copy the HTML file to Flask templates folder
-cp dist/index.html /path/to/flask/templates/
+# Copy all HTML files to Flask templates folder
+cp dist/*.html /path/to/flask/templates/
 
 # Copy all assets to Flask static folder
 cp -r dist/assets/* /path/to/flask/static/assets/
 ```
 
-### Step 2: Update Flask Route
+### Step 2: Update Flask Routes
 
-Create a route in your Flask app to serve the React app:
+Create routes in your Flask app to serve each page:
 
 ```python
 from flask import Flask, render_template
@@ -39,13 +41,17 @@ from flask import Flask, render_template
 app = Flask(__name__)
 
 @app.route('/')
-def index():
-    return render_template('index.html')
+@app.route('/auth')
+def auth():
+    return render_template('auth.html')
 
-# All other routes for the SPA
-@app.route('/<path:path>')
-def catch_all(path):
-    return render_template('index.html')
+@app.route('/onboarding')
+def onboarding():
+    return render_template('onboarding.html')
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
 ```
 
 ### Step 3: Configure CORS (if needed)
@@ -80,11 +86,17 @@ After copying files, your Flask project should look like:
 ```
 flask_project/
 ├── templates/
-│   └── index.html          # React app entry point
+│   ├── auth.html           # Authentication page
+│   ├── onboarding.html     # Onboarding page
+│   └── dashboard.html      # Dashboard page
 ├── static/
 │   └── assets/
-│       ├── index-[hash].js  # React app bundle
-│       ├── index-[hash].css # Styles
+│       ├── auth-[hash].js    # Auth page JS
+│       ├── auth-[hash].css   # Auth page CSS
+│       ├── onboarding-[hash].js
+│       ├── onboarding-[hash].css
+│       ├── dashboard-[hash].js
+│       ├── dashboard-[hash].css
 │       └── [other assets]
 ├── app.py                  # Flask application
 └── requirements.txt
@@ -110,7 +122,7 @@ npm run build
 FLASK_PATH="/path/to/your/flask/project"
 
 # Copy files
-cp dist/index.html "$FLASK_PATH/templates/"
+cp dist/*.html "$FLASK_PATH/templates/"
 rm -rf "$FLASK_PATH/static/assets"
 mkdir -p "$FLASK_PATH/static/assets"
 cp -r dist/assets/* "$FLASK_PATH/static/assets/"
@@ -126,7 +138,7 @@ chmod +x deploy.sh
 
 ## Important Notes
 
-1. **SPA Routing**: Since this is a Single Page Application with client-side routing (React Router), Flask must serve `index.html` for all routes that don't match API endpoints.
+1. **Multi-Page Architecture**: This is now a traditional multi-page application where each page has its own HTML, CSS, and JS files. Navigation between pages causes full page reloads.
 
 2. **API Endpoints**: Keep your API routes separate, typically under `/api/*`:
    ```python
