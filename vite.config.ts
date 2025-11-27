@@ -14,6 +14,11 @@ export default defineConfig(({ mode }) => ({
     outDir: "dist",
     assetsDir: "assets",
     rollupOptions: {
+      input: {
+        auth: path.resolve(__dirname, "auth.html"),
+        onboarding: path.resolve(__dirname, "onboarding.html"),
+        dashboard: path.resolve(__dirname, "dashboard.html"),
+      },
       output: {
         manualChunks: undefined,
       },

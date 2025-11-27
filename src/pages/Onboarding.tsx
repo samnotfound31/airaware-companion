@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -8,7 +7,6 @@ import { Progress } from "@/components/ui/progress";
 import { MapPin, Heart, Bell, ChevronRight } from "lucide-react";
 
 const Onboarding = () => {
-  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [location, setLocation] = useState("San Francisco, CA");
   const [ageGroup, setAgeGroup] = useState("adult");
@@ -26,7 +24,7 @@ const Onboarding = () => {
       isSensitive,
       enableNotifications
     }));
-    navigate("/dashboard");
+    window.location.href = "/static/dashboard.html";
   };
 
   const handleNext = () => {
