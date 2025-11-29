@@ -18,9 +18,9 @@ const Auth = () => {
       // Check if first time user (simplified for demo)
       const isFirstTime = !localStorage.getItem("onboarding_complete");
       if (isFirstTime) {
-        window.location.href = "/static/onboarding.html";
+        window.location.href = "/onboarding";
       } else {
-        window.location.href = "/static/dashboard.html";
+        window.location.href = "/dashboard";
       }
     }, 1000);
   };
