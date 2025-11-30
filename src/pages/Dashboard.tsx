@@ -5,6 +5,8 @@ import ParticleCloud from "@/components/ParticleCloud";
 import { useLocation, useAQIData, useWeatherData } from "@/hooks/useAQIData";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import AIChat from "@/components/AIChat";
+import UserProfile from "@/components/UserProfile";
 
 type AQIBand = "good" | "moderate" | "unhealthy" | "veryUnhealthy" | "hazardous";
 
@@ -258,29 +260,14 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* AI Concierge */}
-        <div className="glass-card rounded-3xl p-6 animate-slide-up" style={{ animationDelay: "0.3s" }}>
-          <h3 className="text-lg font-bold mb-3 flex items-center gap-2">
-            <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-sm font-bold">
-              AI
-            </span>
-            AI Concierge
-          </h3>
-          <p className="text-sm mb-4 leading-relaxed">
-            {currentAQI <= 50 ? 
-              "Air quality is excellent! Perfect conditions for outdoor activities. Enjoy your day! 🌤️" :
-              currentAQI <= 100 ?
-              "Air quality is moderate. Most people can enjoy outdoor activities. Sensitive individuals should consider limiting prolonged exposure." :
-              "Air quality is concerning. Consider limiting outdoor activities, especially if you're sensitive to air pollution."}
-          </p>
-          <div className="flex gap-2 flex-wrap mb-4">
-            <Button variant="outline" size="sm" className="rounded-full">Safe to run?</Button>
-            <Button variant="outline" size="sm" className="rounded-full">Best commute time?</Button>
-            <Button variant="outline" size="sm" className="rounded-full">Need a mask?</Button>
-          </div>
-          <Button className="w-full rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90">
-            Ask Agent
-          </Button>
+        {/* AI Chat Window */}
+        <div className="animate-slide-up" style={{ animationDelay: "0.3s" }}>
+          <AIChat />
+        </div>
+
+        {/* User Profile */}
+        <div className="animate-slide-up" style={{ animationDelay: "0.4s" }}>
+          <UserProfile />
         </div>
 
         {/* Bottom spacing for navigation */}
@@ -312,6 +299,9 @@ const Dashboard = () => {
           </Button>
         </div>
       </nav>
+
+      {/* Floating Chat Launcher */}
+      <AIChat isFloating />
 
       <style>{`
         .hide-scrollbar::-webkit-scrollbar {
