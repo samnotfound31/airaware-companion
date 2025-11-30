@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { MapPin, Bell, User, TrendingUp, Droplets, Wind, Eye, Gauge, Sun } from "lucide-react";
+import { MapPin, Bell, User, TrendingUp, Droplets, Wind, Sun } from "lucide-react";
 import ParticleCloud from "@/components/ParticleCloud";
 import { useLocation, useAQIData, useWeatherData } from "@/hooks/useAQIData";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import AIChat from "@/components/AIChat";
-import UserProfile from "@/components/UserProfile";
 
 type AQIBand = "good" | "moderate" | "unhealthy" | "veryUnhealthy" | "hazardous";
 
@@ -140,7 +139,12 @@ const Dashboard = () => {
               <Bell className="w-5 h-5" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full" />
             </Button>
-            <Button variant="ghost" size="icon" className="rounded-full">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="rounded-full"
+              onClick={() => window.location.href = '/profile'}
+            >
               <User className="w-5 h-5" />
             </Button>
           </div>
@@ -260,45 +264,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* AI Chat Window */}
-        <div className="animate-slide-up" style={{ animationDelay: "0.3s" }}>
-          <AIChat />
-        </div>
-
-        {/* User Profile */}
-        <div className="animate-slide-up" style={{ animationDelay: "0.4s" }}>
-          <UserProfile />
-        </div>
-
-        {/* Bottom spacing for navigation */}
-        <div className="h-24" />
       </main>
-
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 backdrop-blur-xl bg-background/80 border-t border-border/50">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-around">
-          <Button variant="ghost" className="flex-col h-auto py-2 gap-1">
-            <Wind className="w-5 h-5 text-accent" />
-            <span className="text-xs font-medium">Home</span>
-          </Button>
-          <Button variant="ghost" className="flex-col h-auto py-2 gap-1">
-            <TrendingUp className="w-5 h-5" />
-            <span className="text-xs">Insights</span>
-          </Button>
-          <Button variant="ghost" className="flex-col h-auto py-2 gap-1">
-            <MapPin className="w-5 h-5" />
-            <span className="text-xs">Routes</span>
-          </Button>
-          <Button variant="ghost" className="flex-col h-auto py-2 gap-1">
-            <Gauge className="w-5 h-5" />
-            <span className="text-xs">Devices</span>
-          </Button>
-          <Button variant="ghost" className="flex-col h-auto py-2 gap-1">
-            <User className="w-5 h-5" />
-            <span className="text-xs">Profile</span>
-          </Button>
-        </div>
-      </nav>
 
       {/* Floating Chat Launcher */}
       <AIChat isFloating />
