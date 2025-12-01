@@ -124,7 +124,7 @@ export default function AIChat({ isFloating = false }: AIChatProps) {
     return (
       <button
         onClick={toggleExpanded}
-        className="fixed bottom-6 left-6 z-50 glass-card rounded-full p-4 hover:scale-110 transition-transform"
+        className="fixed bottom-6 right-6 z-50 glass-card rounded-full p-4 hover:scale-110 transition-transform"
         aria-label="Open AI chat"
       >
         <MessageSquare className="w-6 h-6 text-accent" />
@@ -142,7 +142,7 @@ export default function AIChat({ isFloating = false }: AIChatProps) {
     <div
       className={`${
         isFloating
-          ? "fixed bottom-6 left-6 w-96 max-h-[600px] z-50 shadow-2xl"
+          ? "fixed bottom-6 right-6 w-96 max-h-[600px] z-50 shadow-2xl"
           : "w-full h-full"
       } glass-card rounded-3xl flex flex-col overflow-hidden animate-slide-up`}
     >

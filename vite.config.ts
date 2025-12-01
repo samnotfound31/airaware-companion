@@ -18,6 +18,7 @@ export default defineConfig(({ mode }) => ({
         auth: path.resolve(__dirname, "auth.html"),
         onboarding: path.resolve(__dirname, "onboarding.html"),
         dashboard: path.resolve(__dirname, "dashboard.html"),
+        profile: path.resolve(__dirname, "profile.html"),
       },
       output: {
         manualChunks: undefined,
