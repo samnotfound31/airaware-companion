@@ -1,6 +1,13 @@
-import { User, Mail, Calendar, AlertCircle, MapPin } from "lucide-react";
+import { User, Mail, Calendar, AlertCircle, MapPin, LogOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export default function UserProfile() {
+  const handleLogout = () => {
+    localStorage.clear();
+    toast.success("Logged out successfully");
+    window.location.href = "/auth";
+  };
   // TODO: fetch profile from /api/profile and populate fields
 
   return (
@@ -70,6 +77,17 @@ export default function UserProfile() {
             <span className="text-muted-foreground italic">{"{{PREFERRED_CITY}}"}</span>
           </div>
         </div>
+
+        {/* Logout Button */}
+        <Button
+          onClick={handleLogout}
+          variant="destructive"
+          className="w-full mt-6"
+          size="lg"
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          Logout
+        </Button>
       </div>
     </div>
   );
