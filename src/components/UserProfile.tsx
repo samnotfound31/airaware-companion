@@ -1,24 +1,7 @@
 import { User, Mail, Calendar, AlertCircle, MapPin } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
 
 export default function UserProfile() {
   // TODO: fetch profile from /api/profile and populate fields
-  // Example API call:
-  // useEffect(() => {
-  //   fetch('/api/profile', {
-  //     headers: { Authorization: `Bearer ${token}` }
-  //   })
-  //   .then(res => res.json())
-  //   .then(data => {
-  //     setFirstName(data.firstName);
-  //     setLastName(data.lastName);
-  //     setEmail(data.email);
-  //     setAge(data.age);
-  //     setSensitivities(data.sensitivities);
-  //     setPreferredCity(data.preferredCity);
-  //   });
-  // }, []);
 
   return (
     <div className="glass-card rounded-3xl p-6 space-y-6 animate-slide-up">
@@ -40,14 +23,8 @@ export default function UserProfile() {
           </label>
           <div className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-secondary/50 border border-border/50">
             <User className="w-4 h-4 text-muted-foreground" />
-            <span className="text-foreground">
-              {/* TODO: Insert name fetch here */}
-              <span className="text-muted-foreground italic">{"{{FIRST_NAME}} {{LAST_NAME}}"}</span>
-            </span>
+            <span className="text-muted-foreground italic">{"{{FIRST_NAME}} {{LAST_NAME}}"}</span>
           </div>
-          <p className="text-xs text-muted-foreground mt-1 pl-2">
-            💡 Developer: Fetch from backend and replace placeholder
-          </p>
         </div>
 
         {/* Email */}
@@ -57,14 +34,8 @@ export default function UserProfile() {
           </label>
           <div className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-secondary/50 border border-border/50">
             <Mail className="w-4 h-4 text-muted-foreground" />
-            <span className="text-foreground">
-              {/* TODO: Insert email fetch here */}
-              <span className="text-muted-foreground italic">{"{{EMAIL}}"}</span>
-            </span>
+            <span className="text-muted-foreground italic">{"{{EMAIL}}"}</span>
           </div>
-          <p className="text-xs text-muted-foreground mt-1 pl-2">
-            💡 Developer: Fetch from backend and replace placeholder
-          </p>
         </div>
 
         {/* Age */}
@@ -74,14 +45,8 @@ export default function UserProfile() {
           </label>
           <div className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-secondary/50 border border-border/50">
             <Calendar className="w-4 h-4 text-muted-foreground" />
-            <span className="text-foreground">
-              {/* TODO: Insert age fetch here */}
-              <span className="text-muted-foreground italic">{"{{AGE}}"}</span>
-            </span>
+            <span className="text-muted-foreground italic">{"{{AGE}}"}</span>
           </div>
-          <p className="text-xs text-muted-foreground mt-1 pl-2">
-            💡 Developer: Fetch from backend and replace placeholder
-          </p>
         </div>
 
         {/* Sensitivities */}
@@ -90,15 +55,9 @@ export default function UserProfile() {
             <AlertCircle className="w-4 h-4" />
             Health Sensitivities / Medical Notes
           </label>
-          <Textarea
-            placeholder="e.g., Asthma, seasonal allergies, etc..."
-            className="min-h-[100px] rounded-2xl"
-            disabled
-            value=""
-          />
-          <p className="text-xs text-muted-foreground mt-1 pl-2">
-            💡 Developer: Replace with actual textarea that saves to backend
-          </p>
+          <div className="min-h-[100px] px-4 py-3 rounded-2xl bg-secondary/50 border border-border/50">
+            <span className="text-muted-foreground italic">{"{{SENSITIVITIES}}"}</span>
+          </div>
         </div>
 
         {/* Preferred Location */}
@@ -108,23 +67,8 @@ export default function UserProfile() {
           </label>
           <div className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-secondary/50 border border-border/50">
             <MapPin className="w-4 h-4 text-muted-foreground" />
-            <span className="text-foreground">
-              {/* TODO: Insert preferred city fetch here */}
-              <span className="text-muted-foreground italic">{"{{PREFERRED_CITY}}"}</span>
-            </span>
+            <span className="text-muted-foreground italic">{"{{PREFERRED_CITY}}"}</span>
           </div>
-          <p className="text-xs text-muted-foreground mt-1 pl-2">
-            💡 Developer: Fetch from backend and replace placeholder
-          </p>
-        </div>
-
-        <div className="pt-4">
-          <Button className="w-full rounded-2xl" disabled>
-            Save Changes
-          </Button>
-          <p className="text-xs text-muted-foreground mt-2 text-center">
-            💡 Connect to backend API endpoint to enable editing
-          </p>
         </div>
       </div>
     </div>
